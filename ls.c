@@ -6,8 +6,11 @@ int main(int argc, char **argv) {
 
     DIR *directory;
 
+    int all = 0;
+    int 
+
     if(argc>1) {
-        // case in which argument is sullied
+        // case in which argument is suplied
         directory = opendir(argv[1]);
     } else {
         //no argument case or empty argument case

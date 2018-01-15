@@ -3,7 +3,7 @@
 int main(int argc, char **argv) {
 
     if (argc <= 1) {
-        printf("One argument is required");
+        printf("At least one argument is required");
         return 1;
     }
 
