@@ -4,27 +4,28 @@
 int main(int argc, char **argv) {
 
 
-    int end_line = 0;
-    int number_line = 0;
+    int end_line = 0; // -E
+    int number_line = 0; // -n
+
+    FILE *fileptr;
 
     if (argc <= 1) {
         printf("At least one argument is required");
         return 1;
     }
 
-    if (argc > 2) {
-        for (int i = 1; i < argc; ++i) {
-            if (strcmp(argv[i], "-E") == 0) {
-                end_line = 1;
-            } else if (strcmp(argv[i], "-n") == 0) {
-                printf("\t1\t");
-                number_line = 1;
-            }
+
+    for (int i = 1; i < argc; ++i) {
+        if (strcmp(argv[i], "-E") == 0) {
+            end_line = 1;
+        } else if (strcmp(argv[i], "-n") == 0) {
+            printf("\t1\t");
+            number_line = 1;
+        } else if (argv[i][0] != '-' && strcmp(argv[i], "") != 0) {
+            fileptr = fopen(argv[i], "r");
         }
     }
 
-    FILE *fileptr;
-    fileptr = fopen(argv[1], "r");
 
     if (fileptr) {
         //if file is opened
@@ -32,10 +33,10 @@ int main(int argc, char **argv) {
         // prints everything character by character
         char c;
         while ((c = (char) fgetc(fileptr)) != EOF) {
-            if(end_line == 1 && c=='\n') {
+            if (end_line == 1 && c == '\n') {
                 printf("$");
             }
-            if(number_line >= 1 && c=='\n') {
+            if (number_line >= 1 && c == '\n') {
                 number_line++;
                 printf("\n\t%d\t", number_line);
                 continue;
