@@ -1,5 +1,9 @@
 #include <stdio.h>
 #include <string.h>
+#include <sys/stat.h>
+#include <limits.h>
+#include <stdlib.h>
+
 
 int main(int argc, char **argv) {
 
@@ -15,6 +19,7 @@ int main(int argc, char **argv) {
     }
 
 
+
     for (int i = 1; i < argc; ++i) {
         if (strcmp(argv[i], "-E") == 0) {
             end_line = 1;
@@ -22,13 +27,26 @@ int main(int argc, char **argv) {
             printf("\t1\t");
             number_line = 1;
         } else if (argv[i][0] != '-' && strcmp(argv[i], "") != 0) {
-            fileptr = fopen(argv[i], "r");
+
+            char realPath[1024];
+            realpath(argv[i],realPath);
+
+            struct stat sb;
+
+            if (stat(realPath, &sb) == 0 && S_ISDIR(sb.st_mode))
+            {
+                printf("\"%s\" is a directory", argv[i]);
+                return -1;
+            }
+
+            fileptr = fopen(realPath, "r");
         }
     }
 
 
     if (fileptr) {
         //if file is opened
+
 
         // prints everything character by character
         char c;
@@ -44,6 +62,7 @@ int main(int argc, char **argv) {
             printf("%c", c);
         }
         fclose(fileptr);
+
     } else {
         printf("Unable to read the file or it doesn't exists \"%s\" \n", argv[1]);
     }
