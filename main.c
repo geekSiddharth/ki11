@@ -2,7 +2,8 @@
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <readline/history.h>
+#include <zconf.h>
+#include <sys/wait.h>
 
 #define LINE_LIMIT 2012
 #define TOKEN_LIMIT 256
@@ -10,20 +11,38 @@
 
 FILE *file;
 char prevpath[LINE_LIMIT];
-
+char PATH[LINE_LIMIT];
 
 int init_shell() {
-//    using_history();
 
-    printf("Welcome to ki11\n\n");
-    char *c = getenv("HOME");
-    file = fopen(strcat(c, "/ki11"), "a+");
+    printf("\n\t===============================\n");
+    printf("\t\tWelcome to ki11\n");
+    printf("\t\tMade by Siddharth\n");
+    printf("\t===============================\n\n");
+
+
+    setenv("PATH","/home/sid/Study/SEM4/OS/assignments/shell_0/external",1);
+
+    file = fopen(strcat(getenv("HOME"), "/ki11"), "a+");
     return 0;
 }
 
 int echo(char *line) {
     printf("%s",line+1);
     return 0;
+}
+
+int pwd() {
+
+    char line[LINE_LIMIT]; // to store the path
+
+    if (getcwd(line, LINE_LIMIT)) {
+        printf("%s\n", line);
+        return 0;
+    }
+
+    perror("ERROR: in cwd");
+    return -1;
 }
 
 int cd(int argc, char **argv) {
@@ -71,19 +90,6 @@ int cd(int argc, char **argv) {
     }
 
     return 1;
-}
-
-int pwd() {
-
-    char line[LINE_LIMIT]; // to store the path
-
-    if (getcwd(line, LINE_LIMIT)) {
-        printf("%s\n", line);
-        return 0;
-    }
-
-    perror("ERROR: in cwd");
-    return -1;
 }
 
 int print_history(int argc, char **argv) {
@@ -148,16 +154,6 @@ int print_history(int argc, char **argv) {
         printf("%d\t%s", counter++, line_read);
     }
 
-//
-//    HIST_ENTRY **the_history_list = history_list();
-//
-//    int counter = 0;
-//    while (the_history_list[counter]!=NULL) {
-//        printf(the_history_list[counter++]->line);
-//    }
-//
-//
-
 }
 
 
@@ -169,13 +165,30 @@ int execute(int argc, char **argv) {
         return pwd();
     } else if (strcmp(argv[0], "cd") == 0) {
         return cd(argc, argv);
-    } else if (strcmp(argv[0], "echo") == 0) {
-
     } else if (strcmp(argv[0], "history") == 0) {
         print_history(argc, argv);
         return 0;
     } else {
-        // do fork and stuffs
+
+        pid_t pid;
+        pid = fork();
+
+        if(pid < 0) {
+            perror("ERROR: ");
+        } else if (pid == 0){
+            //child process
+            if(execlp(argv[0],*argv) == -1) {
+                perror("ERROR:");
+                kill(getpid(),SIGTERM);
+            }
+
+        } else {
+            // parent process
+            int pid_status;
+            if (waitpid(pid, &pid_status, 0) == -1) {
+                printf("Error waiting for child process");
+            }
+        }
 
     }
 
@@ -197,7 +210,7 @@ int main(void) {
     while (1) {
 
         getcwd(dir_name, TOKEN_LIMIT);
-        printf("%s>", dir_name);
+        printf("[ %s ] $", dir_name);
 
         // We empty the line buffer
         memset(line, '\0', LINE_LIMIT);
