@@ -1,0 +1,44 @@
+cat -E Makefile
+cat -n Makefile
+cat -E -n Makefile
+
+mkdir -p -v lev1/lev2/lev3
+mkdir lev1_2
+mkdir -v lev1_3
+
+cd lev1
+cd ~
+pwd
+ls -f
+cd -
+pwd
+ls -A
+cd ..
+ls -a
+
+rm -rf lev1
+rm -f lev1_2
+rm -d lev1_3
+
+history
+
+echo date
+date
+date -u
+date -R
+date -u -R
+
+history 3
+history -c
+
+pwd
+
+cd ~
+
+history 34
+
+echo "This is not fun"
+echo -E "oh my. -E is not there"
+echo -y "-y is there. that's feature not a bug"
+
+

@@ -20,15 +20,40 @@ int init_shell() {
     printf("\t\tMade by Siddharth\n");
     printf("\t===============================\n\n");
 
+    char line[LINE_LIMIT];
+    getcwd(line, LINE_LIMIT);
 
-    setenv("PATH","/home/sid/Study/SEM4/OS/assignments/shell_0/external",1);
+
+    setenv("PATH", strcat(line, "/bin/"), 1);
 
     file = fopen(strcat(getenv("HOME"), "/ki11"), "a+");
     return 0;
 }
 
 int echo(char *line) {
-    printf("%s",line+1);
+
+
+    if(line[0]=='-' && line[1]=='E') {
+        line = line + 3;
+    }
+
+
+    int a=0, b = 0;
+    // to remove the outer " or '
+    // keeps inner " or '
+    for (char *x = line; *x != 0; x++) {
+        if (*x == '\'' && !a) {
+            a = 1, b = 1;
+        } else if (*x == '\'' && a && b) {
+            a = 0, b = 0;
+        } else if (*x == '"' && !a) {
+            a = 1, b = 0;
+        } else if (*x == '"' && a && !b) {
+            a = 0, b = 0;
+        } else {
+            printf("%c", *x);
+        }
+    }
     return 0;
 }
 
@@ -100,7 +125,7 @@ int print_history(int argc, char **argv) {
         // clear history
         if (strcmp(argv[1], "-c") == 0) {
             ftruncate(fileno(file), 0);
-            fprintf(file,"history -c\n");
+            fprintf(file, "history -c\n");
             return 0;
         }
 
@@ -133,7 +158,7 @@ int print_history(int argc, char **argv) {
         fseek(file, 0, SEEK_END);
         int end = (int) ftell(file);
 
-        while (tail != 0 &&  seek_val<end) {
+        while (tail != 0 && seek_val < end) {
 
             fseek(file, end - seek_val, SEEK_SET);
             if (fgetc(file) == '\n') {
@@ -146,9 +171,9 @@ int print_history(int argc, char **argv) {
         fseek(file, 0, SEEK_SET);
     }
 
-    char * line_read = NULL;
+    char *line_read = NULL;
     size_t len = 0;
-    int counter=1;
+    int counter = 1;
 
     while (getline(&line_read, &len, file) != -1) {
         printf("%d\t%s", counter++, line_read);
@@ -173,13 +198,13 @@ int execute(int argc, char **argv) {
         pid_t pid;
         pid = fork();
 
-        if(pid < 0) {
+        if (pid < 0) {
             perror("ERROR: ");
-        } else if (pid == 0){
+        } else if (pid == 0) {
             //child process
-            if(execlp(argv[0],*argv) == -1) {
+            if (execvp(argv[0], argv) == -1) {
                 perror("ERROR:");
-                kill(getpid(),SIGTERM);
+                kill(getpid(), SIGTERM);
             }
 
         } else {
@@ -220,7 +245,7 @@ int main(void) {
 
 
         if (strlen(line) > 3 && line[0] == 'e' && line[1] == 'c' && line[2] == 'h' && line[3] == 'o') {
-            echo(line + 4);
+            echo(line + 5);
             continue;
         }
 
