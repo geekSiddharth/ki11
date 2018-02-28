@@ -1,7 +1,4 @@
-# ki11 : A simple shell for Assignment 0
-
-**Name**: Siddharth Yadav  
-**Roll Number**: 2016268
+# ki11 : A simple shell 
 
 ## Usage
 
@@ -12,6 +9,7 @@ make all
 ```
 
 **Note**: Make sure that while running ki11, `src` must your current directory.  
+
 To delete the executable binaries, use `make clean` in `src` dir
 
 ### External Commands 
